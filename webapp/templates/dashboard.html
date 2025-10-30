@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vehicle Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>🚦 Vehicle Status Dashboard</h1>
+    <table>
+        <tr>
+            <th>Vehicle ID</th>
+            <th>Driver</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Location</th>
+        </tr>
+        {% for v in vehicles %}
+        <tr>
+            <td>{{ v.vehicle_id }}</td>
+            <td>{{ v.driver_name }}</td>
+            <td>{{ v.vehicle_type }}</td>
+            <td>{{ v.status }}</td>
+            <td>{{ v.location }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="/">⬅ Back to Home</a>
+</body>
+</html>

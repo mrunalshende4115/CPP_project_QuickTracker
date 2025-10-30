@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QuickTrack</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>QuickTrack Vehicle Manager</h1>
+
+    <h2>Register Vehicle</h2>
+    <form action="/register" method="post">
+        <input name="vehicle_id" placeholder="Vehicle ID" required>
+        <input name="driver_name" placeholder="Driver Name" required>
+        <input name="vehicle_type" placeholder="Vehicle Type" required>
+        <button type="submit">Register</button>
+    </form>
+    
+    <h2>Delete Vehicle</h2>
+    <form action="/delete" method="post">
+        <input name="vehicle_id" placeholder="Vehicle ID" required>
+        <button type="submit">Delete</button>
+    </form>
+    
+    <h2>Check In</h2>
+    <form action="/checkin" method="post">
+        <input name="vehicle_id" placeholder="Vehicle ID" required>
+        <input name="location" placeholder="Location" required>
+        <button type="submit">Check In</button>
+    </form>
+
+    <h2>Check Out</h2>
+    <form action="/checkout" method="post">
+        <input name="vehicle_id" placeholder="Vehicle ID" required>
+        <input name="location" placeholder="Location" required>
+        <button type="submit">Check Out</button>
+    </form>
+    
+    
+    <h2>View Dashboard</h2>
+    <form action="/dashboard" method="post">
+    <button type="submit">Show Vehicle Status</button>
+    </form>
+    
+</body>
+</html>
