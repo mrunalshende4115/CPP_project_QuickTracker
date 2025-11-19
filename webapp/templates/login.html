@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QuickTrack Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #e0f7fa, #e1bee7);
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .login-card {
+      max-width: 400px;
+      margin: 80px auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      background-color: #fff;
+    }
+    .login-card h3 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #6a1b9a;
+    }
+    .form-control:focus {
+      border-color: #6a1b9a;
+      box-shadow: 0 0 0 0.2rem rgba(106,27,154,.25);
+    }
+    .btn-login {
+      background-color: #6a1b9a;
+      color: #fff;
+    }
+    .btn-login:hover {
+      background-color: #4a148c;
+    }
+    .text-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <h3>Login to QuickTrack</h3>
+    <form method="POST" action="/login">
+      <div class="mb-3">
+        <label for="username" class="form-label">UserName</label>
+        <input type="text" name="username" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" name="password" required>
+      </div>
+      <div class="form-check mb-3">
+        <input type="checkbox" class="form-check-input" id="remember">
+        <label class="form-check-label" for="remember">Remember me</label>
+      </div>
+      <button type="submit" class="btn btn-login w-100">Login</button>
+      <div class="text-link">
+        <a href="/register_user">Create an account</a>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

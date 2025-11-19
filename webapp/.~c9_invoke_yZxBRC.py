@@ -10,12 +10,11 @@ from quicktrack_utils.db import delete_vehicle
 from quicktrack_utils.db import is_vehicle_registered
 from quicktrack_utils.alerts import send_sns_alert
 from flask import redirect, url_for, flash
-from quicktrack_utils.s3_utils import upload_vehicle_docs, get_presigned_url
+from quicktrack_utils.s3_utils import upload_vehicle_docs
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from quicktrack_utils.user import get_user, User
 from quicktrack_utils.vehicle import register_vehicle, get_vehicles_by_warehouse
 from quicktrack_utils.logger import log_event, send_audit_message
-from datetime import datetime
 
 
 app = Flask(__name__)
@@ -94,7 +93,6 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("You have been logged out.")
     return redirect(url_for('login'))
 
 @app.route('/')
@@ -181,17 +179,12 @@ def dashboard():
     try:
         vehicles = get_vehicles_by_warehouse(current_user.warehouse_id)
         print("Fetched vehicles:", vehicles)
-        
-        for v in vehicles:
-           v['registration_doc_url'] = get_presigned_url(v['vehicle_id'], 'registration')
-           v['insurance_doc_url'] = get_presigned_url(v['vehicle_id'], 'insurance')
-     
     except Exception as e:
         print("Error fetching vehicles:", e)
         flash("Error loading dashboard data.")
         vehicles = []
 
-    return render_template('dashboard.html', vehicles=vehicles, current_year=datetime.now().year)
+    return render_template('dashboard.html', vehicles=vehicles)
     
 @app.route('/delete', methods=['POST'])
 @login_required

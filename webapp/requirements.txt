@@ -2,3 +2,4 @@ Flask
 quicktrack4115
 boto3
 watchtower
+Flask-login

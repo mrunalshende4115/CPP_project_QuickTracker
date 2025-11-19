@@ -1,30 +1,48 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Vehicle Dashboard</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <h1>🚦 Vehicle Status Dashboard</h1>
-    <table>
-        <tr>
-            <th>Vehicle ID</th>
-            <th>Driver</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Location</th>
-        </tr>
-        {% for v in vehicles %}
-        <tr>
-            <td>{{ v.vehicle_id }}</td>
-            <td>{{ v.driver_name }}</td>
-            <td>{{ v.vehicle_type }}</td>
-            <td>{{ v.status }}</td>
-            <td>{{ v.location }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <br>
-    <a href="/">⬅ Back to Home</a>
-</body>
-</html>
+{% extends "layout.html" %}
+{% block content %}
+  <h2>Vehicle Status Dashboard</h2>
+  <p><strong>Logged in as:</strong> {{ current_user.username }} | <strong>Warehouse:</strong> {{ current_user.warehouse_id }}</p>
+
+  <table border="1" cellpadding="10" cellspacing="0" style="width:100%; border-collapse: collapse;">
+    <thead style="background-color:#007bff; color:white;">
+      <tr>
+        <th>Vehicle ID</th>
+        <th>Driver Name</th>
+        <th>Vehicle Type</th>
+        <th>Status</th>
+        <th>Location</th>
+        <th>Warehouse ID</th>
+        <th>Registration Document</th>
+        <th>Insurance Document</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for vehicle in vehicles %}
+      <tr>
+        <td>{{ vehicle.vehicle_id }}</td>
+        <td>{{ vehicle.driver_name }}</td>
+        <td>{{ vehicle.vehicle_type }}</td>
+        <td>{{ vehicle.status }}</td>
+        <td>{{ vehicle.location }}</td>
+        <td>{{ vehicle.warehouse_id }}</td>
+        <td>
+          {% if vehicle.registration_doc_url %}
+            <a href="{{ vehicle.registration_doc_url }}" target="_blank">View</a>
+          {% else %}
+            Not uploaded
+          {% endif %}
+        </td>
+        <td>
+          {% if vehicle.insurance_doc_url %}
+            <a href="{{ vehicle.insurance_doc_url }}" target="_blank">View</a>
+          {% else %}
+            Not uploaded
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <br>
+  <a href="{{ url_for('index') }}">⬅ Back to Home</a>
+{% endblock %}
