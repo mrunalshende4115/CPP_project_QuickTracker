@@ -1,5 +1,4 @@
 Flask
-gunicorn
 quicktrack4115
 boto3
 watchtower

@@ -18,18 +18,18 @@ from quicktrack_utils.logger import log_event, send_audit_message
 from datetime import datetime
 
 
-app = Flask(__name__)
-app.secret_key = 'your-secret-key'
+application = Flask(__name__)
+application.secret_key = 'your-secret-key'
 
 login_manager = LoginManager()
-login_manager.init_app(app)
+login_manager.init_app(application)
 login_manager.login_view = 'login' 
 
 @login_manager.user_loader
 def load_user(username):
     return get_user(username)
 
-@app.route('/register_user', methods=['GET', 'POST'])
+@application.route('/register_user', methods=['GET', 'POST'])
 def register_user():
     if request.method == 'POST':
         username = request.form['username']
@@ -47,7 +47,7 @@ def register_user():
         return redirect(url_for('login'))
     return render_template('register_user.html')
 
-@app.route('/login', methods=['GET', 'POST'])
+@application.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -90,20 +90,20 @@ def login():
     return render_template('login.html')
 
 
-@app.route('/logout')
+@application.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash("You have been logged out.")
     return redirect(url_for('login'))
 
-@app.route('/')
+@application.route('/')
 @login_required
 def index():
     vehicles = get_vehicles_by_warehouse(current_user.warehouse_id)
     return render_template('index.html', vehicles=vehicles)
 
-@app.route('/register', methods=['POST'])
+@application.route('/register', methods=['POST'])
 @login_required
 def register():
     vehicle_id = request.form['vehicle_id']
@@ -128,7 +128,7 @@ def register():
 
     return redirect(url_for('index'))
     
-@app.route('/checkin', methods=['POST'])
+@application.route('/checkin', methods=['POST'])
 @login_required
 def checkin():
     vehicle_id = request.form['vehicle_id']
@@ -147,7 +147,7 @@ def checkin():
 
     return redirect(url_for('index'))
 
-@app.route('/checkout', methods=['POST'])
+@application.route('/checkout', methods=['POST'])
 @login_required
 def checkout():
     vehicle_id = request.form['vehicle_id']
@@ -172,7 +172,7 @@ def checkout():
     return render_template('vehicle.html', vehicle_id=vehicle_id, action="Checked Out")
 
 # ✅ NEW: Dashboard route
-@app.route('/dashboard', methods=['GET', 'POST'])
+@application.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     print("Dashboard accessed by:", current_user.username)
@@ -193,7 +193,7 @@ def dashboard():
 
     return render_template('dashboard.html', vehicles=vehicles, current_year=datetime.now().year)
     
-@app.route('/delete', methods=['POST'])
+@application.route('/delete', methods=['POST'])
 @login_required
 def delete():
     vehicle_id = request.form['vehicle_id']
@@ -203,7 +203,7 @@ def delete():
     success = delete_vehicle(vehicle_id, warehouse_id)
 
     if success:
-        send_sns_alert(vehicle_id, "deleted", "N/A", warehouse_id)
+        send_sns_alert(vehicle_id, "deleted", "N/A", warehouse_id, username)
         send_audit_message(vehicle_id, "delete", "success", warehouse_id, username)
         log_event(f"✅ Vehicle {vehicle_id} deleted by {username} from warehouse {warehouse_id}")
         flash(f"✅ Vehicle {vehicle_id} deleted and alert sent.")
@@ -216,4 +216,6 @@ def delete():
 
 
 if __name__ == '__main__':
-   app.run(host='0.0.0.0', port=8080, debug=True)
+   port = int(os.environ.get("PORT", 5000))
+   application.run(host="0.0.0.0", port=port)
+

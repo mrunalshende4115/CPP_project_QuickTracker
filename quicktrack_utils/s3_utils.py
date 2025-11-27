@@ -1,6 +1,7 @@
 import boto3
 
-s3 = boto3.client('s3')
+session = boto3.Session(region_name="us-east-1")
+s3 = session.client('s3')
 bucket_name = 'quicktrack-vehicle-docss'
 
 def get_presigned_url(vehicle_id, doc_type, expires_in=3600):

@@ -14,7 +14,7 @@ def log_event(message):
     
 def send_audit_message(vehicle_id, action, status, warehouse_id, user):
     sqs = boto3.client('sqs', region_name='us-east-1')
-    queue_url = "https://sqs.us-east-1.amazonaws.com/772676455545/QuickTrackAlertAuditQueue"
+    queue_url = "https://sqs.us-east-1.amazonaws.com/150302467911/QuickTrackAlertAuditQueue"
 
     message = {
         "vehicle_id": vehicle_id,
