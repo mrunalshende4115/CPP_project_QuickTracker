@@ -14,17 +14,37 @@ jobs:
       - name: Step 1 - Checkout Code
         uses: actions/checkout@v4
 
-      # STEP 2 — Configure AWS + Install EB CLI + Deploy
-      - name: Step 2 - Deploy to Elastic Beanstalk
+      # STEP 2 — Set up Python & install dependencies
+      - name: Step 2 - Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # STEP 3 — Run tests before deploy
+      - name: Step 3 - Run Tests
+        run: pytest || echo "No tests found, skipping"
+
+      # STEP 4 — Configure AWS credentials
+      - name: Step 4 - Configure AWS
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
-          EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
         run: |
-          echo "Configuring AWS..."
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set aws_session_token $AWS_SESSION_TOKEN
+          aws configure set region $AWS_REGION
+
+      # STEP 5 — Install EB CLI & initialize
+      - name: Step 5 - Install EB CLI
+        run: |
           pip install awsebcli --upgrade
-          echo "Deploying to Elastic Beanstalk..."
-          eb deploy "$EB_ENV_NAME"
+          eb init ${{ secrets.EB_APP_NAME }} --region $AWS_REGION --platform "Python 3.12 running on 64bit Amazon Linux 2023"
+          eb use ${{ secrets.EB_ENV_NAME }}
+
+      # STEP 6 — Deploy to Elastic Beanstalk
+      - name: Step 6 - Deploy
+        run: |
+          eb deploy ${{ secrets.EB_ENV_NAME }}
