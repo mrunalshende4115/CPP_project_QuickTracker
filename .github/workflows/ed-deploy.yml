@@ -1,0 +1,30 @@
+name: Deploy to Elastic Beanstalk
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # STEP 1 — Checkout source code
+      - name: Step 1 - Checkout Code
+        uses: actions/checkout@v4
+
+      # STEP 2 — Configure AWS + Install EB CLI + Deploy
+      - name: Step 2 - Deploy to Elastic Beanstalk
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
+          EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
+        run: |
+          echo "Configuring AWS..."
+          pip install awsebcli --upgrade
+          echo "Deploying to Elastic Beanstalk..."
+          eb deploy "$EB_ENV_NAME"
