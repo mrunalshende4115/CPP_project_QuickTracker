@@ -42,4 +42,17 @@ jobs:
           aws configure set aws_session_token "$AWS_SESSION_TOKEN"
           aws configure set region "$AWS_REGION"
 
-      #
+      # STEP 5 — Install EB CLI & initialize
+      - name: Step 5 - Install EB CLI
+        run: |
+          pip install awsebcli --upgrade
+          eb init "$EB_APP_NAME" \
+            --region "$AWS_REGION" \
+            --platform "Python 3.12 running on 64bit Amazon Linux 2023"
+
+          eb use "$EB_ENV_NAME"
+
+      # STEP 6 — Deploy
+      - name: Step 6 - Deploy to Elastic Beanstalk
+        run: |
+          eb deploy "$EB_ENV_NAME"
