@@ -21,9 +21,13 @@ from datetime import datetime
 application = Flask(__name__)
 application.secret_key = 'your-secret-key'
 
+# Configure Flask-Login for user authentication
+
 login_manager = LoginManager()
 login_manager.init_app(application)
 login_manager.login_view = 'login' 
+
+# Load user from DynamoDB when Flask-Login needs it
 
 @login_manager.user_loader
 def load_user(username):
@@ -74,15 +78,15 @@ def login():
                 user = User(
                     username=item["username"],
                     warehouse_id=item["warehouse_id"],
-                    role=item.get("role", "user")  # Optional: default to "user"
+                    role=item.get("role", "user")  
                 )
                 login_user(user)
-                print("✅ Login successful for:", username)
+                print(" Login successful for:", username)
                 return redirect(url_for('index'))
             else:
-                print("❌ Password mismatch for:", username)
+                print(" Password mismatch for:", username)
         else:
-            print("❌ No user found for:", username)
+            print(" No user found for:", username)
 
         flash("Invalid credentials")
         return redirect(url_for('login'))
@@ -97,6 +101,8 @@ def logout():
     flash("You have been logged out.")
     return redirect(url_for('login'))
 
+#VEHICLE MANAGEMENT
+
 @application.route('/')
 @login_required
 def index():
@@ -109,22 +115,28 @@ def register():
     vehicle_id = request.form['vehicle_id']
     driver_name = request.form['driver_name']
     vehicle_type = request.form['vehicle_type']
-    warehouse_id = current_user.warehouse_id  # ✅ auto-scoped
+    warehouse_id = current_user.warehouse_id  
+
+    # Prevent duplicate registration
 
     if is_vehicle_registered(vehicle_id, warehouse_id):
-        flash(f"❌ Vehicle {vehicle_id} is already registered.")
+        flash(f" Vehicle {vehicle_id} is already registered.")
         return redirect(url_for('index'))
+
+    # Upload registration and insurance docs to S3
 
     reg_file = request.files['registration_doc']
     ins_file = request.files['insurance_doc']
     reg_url, ins_url = upload_vehicle_docs(vehicle_id, reg_file, ins_file)
 
+    # Save vehicle record in DB
+
     success = register_vehicle(vehicle_id, driver_name, vehicle_type, reg_url, ins_url, warehouse_id)
 
     if success:
-        flash(f"✅ Vehicle {vehicle_id} registered successfully.")
+        flash(f" Vehicle {vehicle_id} registered successfully.")
     else:
-        flash(f"❌ Registration failed due to unknown error.")
+        flash(f" Registration failed due to unknown error.")
 
     return redirect(url_for('index'))
     
@@ -140,10 +152,10 @@ def checkin():
     success = update_status(vehicle_id, data['status'], data['location'], warehouse_id)
 
     if not success:
-        flash(f"❌ Check-in failed: Vehicle {vehicle_id} is not currently in use.")
+        flash(f" Check-in failed: Vehicle {vehicle_id} is not currently in use.")
     else:
         send_sns_alert(vehicle_id, "check-in", location, warehouse_id, username)
-        flash(f"✅ Vehicle {vehicle_id} checked in to Warehouse successfully.")
+        flash(f" Vehicle {vehicle_id} checked in to Warehouse successfully.")
 
     return redirect(url_for('index'))
 
@@ -155,23 +167,25 @@ def checkout():
     warehouse_id = current_user.warehouse_id
     username = current_user.username
 
+    # Ensure vehicle is registered before checkout
+
     if not is_vehicle_registered(vehicle_id, warehouse_id):
         send_sns_alert(vehicle_id, "check-out", "failed", warehouse_id, username)
-        flash(f"❌ Check-out failed: Vehicle {vehicle_id} is not registered in warehouse {warehouse_id}.")
+        flash(f" Check-out failed: Vehicle {vehicle_id} is not registered in warehouse {warehouse_id}.")
         return render_template('vehicle.html', vehicle_id=vehicle_id, action="Check-Out Failed")
 
     data = check_out(vehicle_id, location)
     success = update_status(vehicle_id, data['status'], data['location'], warehouse_id)
 
     if not success:
-        flash(f"❌ Check-out failed: Invalid state transition or warehouse mismatch.")
+        flash(f" Check-out failed: Invalid state transition or warehouse mismatch.")
         return render_template('vehicle.html', vehicle_id=vehicle_id, action="Check-Out Failed")
 
     send_sns_alert(vehicle_id, "check-out", location, warehouse_id, username)
-    flash(f"✅ Vehicle {vehicle_id} checked out from {location}.")
+    flash(f"Vehicle {vehicle_id} checked out from {location}.")
     return render_template('vehicle.html', vehicle_id=vehicle_id, action="Checked Out")
 
-# ✅ NEW: Dashboard route
+# ashboard route
 @application.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
@@ -205,12 +219,12 @@ def delete():
     if success:
         send_sns_alert(vehicle_id, "deleted", "N/A", warehouse_id, username)
         send_audit_message(vehicle_id, "delete", "success", warehouse_id, username)
-        log_event(f"✅ Vehicle {vehicle_id} deleted by {username} from warehouse {warehouse_id}")
-        flash(f"✅ Vehicle {vehicle_id} deleted and alert sent.")
+        log_event(f"Vehicle {vehicle_id} deleted by {username} from warehouse {warehouse_id}")
+        flash(f"Vehicle {vehicle_id} deleted and alert sent.")
     else:
         send_audit_message(vehicle_id, "delete", "failed", warehouse_id, username)
-        log_event(f"❌ Failed to delete vehicle {vehicle_id} by {username} from warehouse {warehouse_id}")
-        flash(f"❌ Failed to delete vehicle {vehicle_id}.")
+        log_event(f"Failed to delete vehicle {vehicle_id} by {username} from warehouse {warehouse_id}")
+        flash(f"Failed to delete vehicle {vehicle_id}.")
 
     return redirect(url_for('index'))
 

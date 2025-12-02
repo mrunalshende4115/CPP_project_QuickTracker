@@ -1,5 +1,0 @@
-[
-  {"vehicle_id": "V001", "driver_name": "Alice", "vehicle_type": "Van"},
-  {"vehicle_id": "V002", "driver_name": "Bob", "vehicle_type": "Truck"},
-  {"vehicle_id": "V003", "driver_name": "Charlie", "vehicle_type": "Car"}
-]

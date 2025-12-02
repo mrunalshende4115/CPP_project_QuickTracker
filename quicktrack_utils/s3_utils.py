@@ -4,6 +4,8 @@ session = boto3.Session(region_name="us-east-1")
 s3 = session.client('s3')
 bucket_name = 'quicktrack-vehicle-docss'
 
+#presigned url so that user can access for particular time 
+
 def get_presigned_url(vehicle_id, doc_type, expires_in=3600):
     key = f"{vehicle_id}/{doc_type}.pdf"
     try:
@@ -14,8 +16,10 @@ def get_presigned_url(vehicle_id, doc_type, expires_in=3600):
         )
         return url
     except Exception as e:
-        print(f"❌ Failed to generate pre-signed URL for {key}: {e}")
+        print(f" Failed to generate pre-signed URL for {key}: {e}")
         return None
+        
+#uploading my documents in S3
 
 def upload_vehicle_docs(vehicle_id, reg_file, ins_file):
     reg_key = f"{vehicle_id}/registration.pdf"
